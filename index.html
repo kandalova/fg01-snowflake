@@ -93,18 +93,74 @@
 			//выводим путь на экран
 			context.stroke();
 		}
+
+		function NewTriangle(p, i){
+            //треть отрезка
+            var x1 = p[0].x + (p[1].x - p[0].x)/3;
+            var y1 = p[0].y + (p[1].y - p[0].y)/3;
+            
+            var y3 = p[0].y + 2 * (p[1].y - p[0].y)/3;
+            var x3 = p[0].x + 2 * (p[1].x - p[0].x)/3;          
+            
+            //вершина
+           if (!i){
+                var x2 = (x1 + x3 + (y1- y3)*Math.sqrt(3))/2;
+                var y2 = (y1+ y3 + (x3 - x1)*Math.sqrt(3))/2; 
+           }
+           else{
+                var x2 = (x1 + x3 - (y1- y3)*Math.sqrt(3))/2;
+                var y2 = (y1 + y3 - (x3 - x1)*Math.sqrt(3))/2; 
+           }           
+		   return [{x:x1, y:y1}, {x:x2, y:y2}, {x:x3, y:y3}]  ;   
+		}
+
+
+        function Draw(points, n, context,i) {
+            if (n <= 0) {
+                context.beginPath();
+                
+                context.moveTo(points[0].x, points[0].y);
+                context.lineTo(points[1].x, points[1].y);
+                context.stroke();
+            }
+            else {
+               
+                var np = NewTriangle(points, i);
+                
+                Draw([ points[0], np[0] ], n-1, context, i);
+                Draw([ np[0], np[1] ], n-1, context,i);
+                Draw([ np[1], np[2] ], n-1, context,i);
+                Draw([ np[2], points[1], ], n-1, context,i);
+            }
+        }
 		
 		//вызывается после загрузки body
 		function run () {
-			example1();
-			example2();
-			example3();
+			var canvas = document.getElementById("canvas2");
+            var canvasHeight = parseInt(canvas.getAttribute("height"));
+            var canvasWidth = parseInt(canvas.getAttribute("width"));
+            var context = canvas.getContext('2d');
+            //задаем стиль линий
+            context.lineWidth = "1";
+            context.strokeStyle = "black";            
+            var x1 = 100;
+            var y1 = 250;
+            var x3 = 300;
+            var y3 = 250;
+            var x2 = (x1 + x3 - (y1- y3)*Math.sqrt(3))/2;
+            var y2 = (y1 + y3 - (x3 - x1)*Math.sqrt(3))/2; 
+            var n = 4;            
+
+            Draw([{x:x1, y:y1}, {x:x3, y:y3}], n, context,0);
+            Draw([{x:x1, y:y1}, {x:x2, y:y2}], n, context,1);
+            Draw([{x:x2, y:y2}, {x:x3, y:y3}], n, context,1);
 		}
+
 	</script>
 
 <body onload="run()">
   <canvas height='200' width='200' id='canvas1'></canvas>
-  <canvas height='200' width='200' id='canvas2'></canvas>
+  <canvas height='1000' width='500' id='canvas2'></canvas>
   <canvas height='200' width='200' id='canvas3'></canvas>
 </body>
 </html>
